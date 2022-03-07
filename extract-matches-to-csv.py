@@ -2,15 +2,23 @@ import sys
 import re
 import glob
 
-# Ancestry DNA shared matches to a csv file, intended to create a matrix of
-# matches to each other.
-# For your own, and from your matches "shared matches" pages, use browser to
-# "save page as text".
-# Name each one as .txt and place all together with this program.
-# Program output to stdout.
-#
-# Assumptions: english pages, names contain only ascii
-# Needs: Python 3.6+
+"""
+Ancestry DNA shared matches to a csv file, intended to create a matrix of
+matches to each other.
+For your own, and from your matches "shared matches" pages, use browser to
+"save page as text".
+Name each one as .txt and place all together with this program.
+Program output to stdout.
+
+Assumptions: english pages, names contain only ascii
+Needs: Python 3.6+
+
+This code is released under the MIT License: https://opensource.org/licenses/MIT
+Copyright (c) 2022 John A. Andrea
+v1.0
+
+No support provided.
+"""
 
 def get_owner_name( s, pattern1, pattern2 ):
     result = None
