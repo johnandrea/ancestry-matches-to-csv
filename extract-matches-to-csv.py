@@ -57,10 +57,10 @@ def is_int( s ):
 min_cm = 32
 
 
-name_pattern1 = re.compile( r'^(.*)\'s DNA Matches$' ) # account owner
-name_pattern2 = re.compile( r'^You and (.*)$' ) # matches of account owner
+name_pattern1 = re.compile( r'^(.*)\'s DNA Matches$' ) # account owner page
+name_pattern2 = re.compile( r'^You and (.*)$' ) # page is a match of account owner
 url_pattern = re.compile( r'discoveryui-matches/compare' )
-cm_pattern = re.compile( r'^(.*) cm | ' )
+cm_pattern = re.compile( r'^([0-9].*[0-9]) cm | ' )
 
 not_names = [] # must be lower case
 not_names.append( 'view match' )
