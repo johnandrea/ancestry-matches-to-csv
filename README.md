@@ -58,7 +58,92 @@ Attach a person's id to the person name. Default is to put ids in a separate col
 ## Examples ##
 
 Account owner's page:
-![account owner](account-screenshot.jpg)
+![account owner](examples/account-screenshot.jpg)
+
+Text from account owner page:
+
+```
+Skip Ancestry navigation <#skipped-nav> Main Menu Ancestry Home
+<https://www.ancestry.ca/>
+...
+
+  Account owner's DNA Matches
+...
+
+    Close Family
+
+<https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID2>
+
+      Match name 1
+      <https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID2>
+
+Uncle
+1,486 cM | 21% shared DNA
+Father's side
+No Trees
+View match
+
+Uncle
+1,486 cM | 21% shared DNA
+
+Father's side
+No Trees
+View match
+
+<https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID3>
+
+      Another match
+      <https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID3>
+
+1st cousin
+929 cM | 13% shared DNA
+Father's side
+Unlinked Tree
+...
+```
 
 Match to owner page:
-![match page](match-screenshot.jpg)
+![match page](examples/match-screenshot.jpg)
+
+Text from match page:
+
+```
+Skip Ancestry navigation <#skipped-nav> Main Menu Ancestry Home
+<https://www.ancestry.ca/>
+...
+
+Profile photo of user Account owner.
+Profile photo of user Match name 3.
+
+  You and Match name 3
+  <https://www.ancestry.ca/account/profile/id>
+
+2nd cousin 1x removed| Father's side
+1% shared DNA: 103 cM across 3 segments
+Message
+<https://www.ancestry.ca/messaging/?id&testguid1=ID1&testguid2=ID4>
+Add/edit groups
+Add note
+...
+    Close Family
+
+<https://www.ancestry.ca/discoveryui-matches/compare/ID2/with/ID4>
+
+      Match name 1
+      <https://www.ancestry.ca/discoveryui-matches/compare/ID2/with/ID4>
+
+Uncle
+1,486 cM | 21% shared DNA
+Father's side
+No Trees
+View match
+```
+
+Output using "--id-with-name" option:
+
+```
+"name 1","name 2","cM"
+"Account owner/ID1","Match name 1/ID2","1486"
+"Account owner/ID1","Another match/ID3","929"
+"Match name 3/ID4","Match name 1/ID2","1486"
+```
