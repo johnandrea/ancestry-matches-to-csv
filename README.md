@@ -1,6 +1,6 @@
 # extact-matches-to-csv
 
-Make a comma separated values (CSV) file from the text representation of Ancestry DNA mtches
+Make a comma separated values (CSV) file from the text representation of Ancestry DNA matches
 from a web browser.
 
 - Requires Python 3.6+
