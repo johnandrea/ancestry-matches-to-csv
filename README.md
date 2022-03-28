@@ -22,6 +22,7 @@ Depending on the Python installation method, it may be necessary to use the comm
 to run the program like this:
 ``` 
 python extract-matches-to-csv.py
+dir matches.csv
 ```
 
 Example of using the command line to change options:
