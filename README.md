@@ -9,8 +9,8 @@ from a web browser.
 ## Usage ##
 
 From your Ancestry page displaying shared matches: scroll to the bottom of the page or as
-far down as the end of interesting matches. Then from the browser File -> Save As menu, save
-the output as a text file named with ".txt".
+far down as the end of interesting matches. Then from the browser use the menu File -> Save As
+to save the output as a text file named with ".txt".
 
 Do the same for any of the linked shared match people.
 
