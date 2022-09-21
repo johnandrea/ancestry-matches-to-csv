@@ -41,7 +41,7 @@ that a file is created without resorting to command line usage.
 
 --min-cm CMVALUE
 
-Default 22. Reject and natches with a cM match smaller that this value.
+Default 22. Reject and natches with a cM match smaller than this value.
 
 --skip-hesder
 
