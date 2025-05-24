@@ -1,37 +1,28 @@
-Skip Ancestry navigation <#skipped-nav> Main Menu Ancestry Home
-<https://www.ancestry.ca/>
 ...
 
-  Account owner's DNA Matches
-...
 
-    Close Family
+1.
 
-<https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID2>
+    Match name 1
+    <https://www.ancestry.*/discoveryui-matches/compare/ID1/with/ID2>
 
-      Match name 1
-      <https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID2>
+    Uncle
+    1,486 cM | 21% shared DNA
+    ...
 
-Uncle
-1,486 cM | 21% shared DNA
-Father's side
-No Trees
-View match
 
-Uncle
-1,486 cM | 21% shared DNA
+2.
+    Match name 2
+    <https://www.ancestry.*/discoveryui-matches/compare/ID1/with/ID3>
 
-Father's side
-No Trees
-View match
+    1st cousin
+    929 cM | 13% shared DNA
+    ...
 
-<https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID3>
+3.
+    Match name 3
+    <https://www.ancestry.*/discoveryui-matches/compare/ID1/with/ID4>
 
-      Another match
-      <https://www.ancestry.ca/discoveryui-matches/compare/ID1/with/ID3>
-
-1st cousin
-929 cM | 13% shared DNA
-Father's side
-Unlinked Tree
-...
+    1st cousin
+    919 cM | 13% shared DNA
+    ...
