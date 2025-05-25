@@ -54,7 +54,7 @@ end_pattern = re.compile( r'^.*matchesofmatches> *$' )
 
 full_pattern = re.compile( r'^(.*) <https://www.ancestry.*/discoveryui-matches/compare/([A-Za-z0-9-]*)/with/([A-Za-z0-9-]*)/matchesofmatches>' )
 
-with open( 'matches.csv', 'w', encoding='utf-8' ) as outf:
+with open( 'shared-matches.csv', 'w', encoding='utf-8' ) as outf:
 
      header = '"you","cM with Other","Other","Other id","Match,"cM with Other","Match id"'
      print( header, file=outf )
