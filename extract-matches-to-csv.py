@@ -2,6 +2,7 @@ import sys
 import re
 import glob
 import argparse
+sys.stdout.reconfigure(encoding='utf-8')
 
 '''
 Ancestry DNA shared matches to a csv file, intended to create a matrix of  matches to each other.
@@ -22,7 +23,7 @@ Needs: Python 3.6+
 This code is released under the MIT License:
 https://opensource.org/licenses/MIT
 Copyright (c) 2025 John A. Andrea
-v3.0
+v3.1
 
 No support provided.
 '''
@@ -118,7 +119,7 @@ options = get_program_options()
 compareurl_pattern = re.compile( r'^.*discoveryui-matches/compare/([A-Za-z0-9-]*)/with/([A-Za-z0-9-]*)>' )
 cm_pattern = re.compile( r'^(.*) cM | ' )
 
-with open( options['out-file'], 'w' ) as outf:
+with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
      if options['add-header']:
         header = '"name 1","name 2","cM"'
@@ -132,7 +133,7 @@ with open( options['out-file'], 'w' ) as outf:
      for filename in glob.glob( '*.txt' ):
          #print( filename, file=sys.stderr )
 
-         with open( filename ) as inf:
+         with open( filename, 'r', encoding='utf-8' ) as inf:
               match_name = ''
               owner_id = ''
               match_id = ''
