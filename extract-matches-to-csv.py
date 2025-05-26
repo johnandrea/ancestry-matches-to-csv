@@ -23,7 +23,7 @@ Needs: Python 3.6+
 This code is released under the MIT License:
 https://opensource.org/licenses/MIT
 Copyright (c) 2025 John A. Andrea
-v3.1
+v3.1.1
 
 No support provided.
 '''
@@ -77,10 +77,12 @@ def get_program_options():
 
 
 def escape_quote( s ):
-    return str(s).replace( '"', '\"').replace( "'", "\'" )
+    # inside a csv file, add the escape slash
+    return str(s).replace( '"', '\\"').replace( "'", "\\'" )
 
 
 def quoted( s ):
+    # add quotes for each csv field
     return '"' + s.strip() + '"'
 
 

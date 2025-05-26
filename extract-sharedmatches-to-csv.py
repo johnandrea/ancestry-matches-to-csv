@@ -36,13 +36,13 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9.2
-#
+# v0.9.3
 # No support provided.
 
 
 def escape_quote( s ):
-    return str(s).replace( '"', '\"').replace( "'", "\'" )
+    # inside a csv file, add the escape slash
+    return str(s).replace( '"', '\\"').replace( "'", "\\'" )
 
 
 def quoted( s ):
