@@ -37,7 +37,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9.7
+# v0.9.8
 # No support provided.
 
 
@@ -109,13 +109,14 @@ def escape_quote( s ):
 
 
 def quoted( s ):
+    # inside a csv
     return '"' + s.strip() + '"'
 
 
 def output_header( f ):
     # "you","cM with Other","relation with Other"
     # ,"Other","Other id"
-    # ,"Match","cM with Other","Match id","relation with Other"
+    # ,"Match","cM with Other","relation with Other"
 
     out = '"you","cM with Other"'
     if options['add-relation']:
@@ -179,8 +180,6 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
         output_header( outf )
 
      for filename in glob.glob( '*.txt' ):
-         #print( filename, file=sys.stderr )
-
          with open( filename, 'r', encoding='utf-8' ) as inf:
               found_you_and = False
               name_of_match = ''
@@ -259,7 +258,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
                            else:
                               # it is possible something was wrong
-                              print( 'didnt match:', file=sys.stderr )
+                              print( 'didnt match compare url:', file=sys.stderr )
                               print( match_line, file=sys.stderr )
 
                            # start looking for another match
