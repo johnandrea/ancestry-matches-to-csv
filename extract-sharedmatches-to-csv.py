@@ -79,7 +79,7 @@ with open( 'shared-matches.csv', 'w', encoding='utf-8' ) as outf:
               for line in inf:
                   line = line.strip()
                   if line:
-                     print( line )
+                     #print( line )
                      n += 1
 
                      if line.startswith( 'You and ' ) and not found_you_and:
@@ -115,7 +115,7 @@ with open( 'shared-matches.csv', 'w', encoding='utf-8' ) as outf:
 
                         m = full_pattern.match( match_line )
                         if m:
-                           print( '! output' )
+                           #print( '! output' )
                            other_name = m.group(1)
                            match_id = m.group(2)
                            other_id = m.group(3)
