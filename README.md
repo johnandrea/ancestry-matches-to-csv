@@ -16,9 +16,12 @@ From your Ancestry page displaying matches (or shared matches): from the browser
 to save the output as a text file named with extension ".txt".
     Do that with as many next pages as you desire, giving each saved file a unique name ending in ".txt".
     The program reads all ".txt" files in the current directory.
+
 Keep the two types of output separate (owner matches vs shared matches) because they have different formats and  the scripts themseles do not attempt to select which format is being used.
-    
-Copy this Python program into the folder containing those text files and run it by clicking on
+
+## Installation ##
+
+Copy this Python scripts into the folder containing those text files and run it by clicking on
 it (in a windowing environment) or using the command line to change the options. The output
 file (if default) will be created in the same folder.
 
