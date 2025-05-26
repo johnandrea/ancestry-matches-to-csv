@@ -37,7 +37,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9.6
+# v0.9.7
 # No support provided.
 
 
@@ -52,6 +52,7 @@ def get_program_options():
     # with names flipped into 'positive' verbs
     results['add-id'] = True
     results['add-header'] = True
+    results['add-relation'] = True
 
     arg_help = 'Convert Ancestry matches output to CSV list.'
     parser = argparse.ArgumentParser( description=arg_help )
@@ -59,6 +60,10 @@ def get_program_options():
     arg_help = 'Do not include a header in the output file.'
     arg_default = not results['add-header']
     parser.add_argument( '--skip-header', default=arg_default, action='store_true', help=arg_help )
+
+    arg_help = 'Do not include relationship estimates in the output file.'
+    arg_default = not results['add-relation']
+    parser.add_argument( '--skip-relationship', default=arg_default, action='store_true', help=arg_help )
 
     arg_help = 'Do not include account unique ids in the output file.'
     arg_default = not results['add-id']
@@ -85,6 +90,7 @@ def get_program_options():
 
     results['add-id'] = not args.skip_id
     results['add-header'] = not args.skip_header
+    results['add-relation'] = not args.skip_relationship
 
     return results
 
@@ -106,7 +112,29 @@ def quoted( s ):
     return '"' + s.strip() + '"'
 
 
-def output( owner, owner_cm, other_name, other_id, match_name, match_id, match_cm, f ):
+def output_header( f ):
+    # "you","cM with Other","relation with Other"
+    # ,"Other","Other id"
+    # ,"Match","cM with Other","Match id","relation with Other"
+
+    out = '"you","cM with Other"'
+    if options['add-relation']:
+       out += ',"relation with Other"'
+
+    out += ',"Other"'
+    if options['add-id'] and not options['id-with-name']:
+       out += ',"Other id"'
+
+    out += ',"Match","cM with Other"'
+    if options['add-id'] and not options['id-with-name']:
+       out += ',"Match id"'
+    if options['add-relation']:
+       out += ',"relation with Other"'
+
+    print( out, file=f )
+
+
+def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_id, match_cm, match_relation, f ):
     # as csv
     if is_int( owner_cm ) and int(owner_cm) >= options['min-cm']:
        name1 = escape_quote( owner )
@@ -120,6 +148,8 @@ def output( owner, owner_cm, other_name, other_id, match_name, match_id, match_c
 
        out = quoted( name1 )
        out += ',' + quoted( owner_cm )
+       if options['add-relation']:
+          out += ',' + quoted( owner_relation )
        out += ',' + quoted( name2 )
        if options['separate-id']:
           out += ',' + quoted( other_id )
@@ -127,6 +157,8 @@ def output( owner, owner_cm, other_name, other_id, match_name, match_id, match_c
        if options['separate-id']:
           out += ',' + quoted( match_id )
        out += ',' + quoted( match_cm )
+       if options['add-relation']:
+          out += ',' + quoted( match_relation )
 
        print( out, file=f )
 
@@ -149,14 +181,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
      print( 'output in', options['out-file'] )
 
      if options['add-header']:
-        if options['add-id']:
-           if options['id-with-name']:
-              header = '"you","cM with Other","Other","Match","cM with Other"'
-           else:
-              header = '"you","cM with Other","Other","Other id","Match","cM with Other","Match id"'
-        else:
-           header = '"you","cM with Other","Other","Match","cM with Other"'
-        print( header, file=outf )
+        output_header( outf )
 
      for filename in glob.glob( '*.txt' ):
          #print( filename, file=sys.stderr )
@@ -182,7 +207,9 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
               other_name = ''
               your_cm = ''
+              your_relation = ''
               match_cm = ''
+              prev_line = ''
 
               for line in inf:
                   line = line.strip()
@@ -220,10 +247,12 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
                         if cm_count == 1:
                            your_cm = cm
+                           your_relation = prev_line
 
                         else:
                            # second cM line
                            match_cm = cm
+                           match_relation = prev_line
 
                            m = full_pattern.match( match_line )
                            if m:
@@ -232,7 +261,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                               match_id = m.group(2)
                               other_id = m.group(3)
 
-                              output( 'you', your_cm, other_name, other_id, name_of_match, match_id, match_cm, outf )
+                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_id, match_cm, match_relation, outf )
 
                            else:
                               # it is possible something was wrong
@@ -243,3 +272,5 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                            match_open = False
                            match_ready = False
                            cm_open = False
+
+                     prev_line = line
