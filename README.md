@@ -14,7 +14,7 @@ The second works on files from the account owner's pages of shared matches.
 
 From your Ancestry page displaying matches (or shared matches): from the browser use the menu File -> Save As
 to save the output as a text file named with ".txt".
-    Do this as with as many next pages as you desire, giving each saved file a unique name ending in ".txt".
+    Do that with as many next pages as you desire, giving each saved file a unique name ending in ".txt".
     The program reads all ".txt" files in the current directory.
 Keep the two types of output separate (owner matches vs shared matches) because they have different formats and  the scripts themseles do not attempt to select which format is being used.
     
