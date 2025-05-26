@@ -21,7 +21,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # Your:
 # relation of you with OTHERMATCH
 # X cM
-# paternal/maternal side
+# ...
 # MATCHNAME's
 # relation of MATCHNAME with OTHERMATCH
 # Y cM
@@ -37,7 +37,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9.5
+# v0.9.6
 # No support provided.
 
 
@@ -136,6 +136,8 @@ end_pattern = re.compile( r'^.*matchesofmatches> *$' )
 
 full_pattern = re.compile( r'^(.*) <https://www.ancestry.*/discoveryui-matches/compare/([A-Za-z0-9-]*)/with/([A-Za-z0-9-]*)/matchesofmatches>' )
 
+cm_pattern = re.compile( r'^([0-9,]+) cM$')
+
 partial_url = re.compile( r' <http.*' )
 
 options = get_program_options()
@@ -163,21 +165,28 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
               found_you_and = False
               name_of_match = ''
 
+              # found the line that starts with other name and ids
               match_open = False
+
+              # found the end of the ids url
               match_ready = False
+
+              # what the whole match line will be
               match_line = ''
-              your_n = 0
+
+              # found the line "Your:"
+              cm_open = False
+
+              # number of cM lines after "Your:"
+              cm_count = 0
 
               other_name = ''
               your_cm = ''
               match_cm = ''
 
-              n = 0
               for line in inf:
                   line = line.strip()
                   if line:
-                     #print( line )
-                     n += 1
 
                      if line.startswith( 'You and ' ) and not found_you_and:
                         # this occors only once per input file
@@ -186,12 +195,11 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                         # the name might look like: You and First Second <https://www.ancestry...
                         # so also get rid of that url
                         name_of_match = re.sub( partial_url, '', name_of_match )
-                        #print( '! you and', n, name_of_match )
 
                      m = start_pattern.match( line )
                      if m and found_you_and:
                         match_open = True
-                        #print( '! open', n, line )
+                        match_line = ''
 
                      if match_open:
                         match_line += line
@@ -200,33 +208,38 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                      if m and match_open:
                         match_open = False
                         match_ready = True
-                        #print( '! close', n, line )
 
                      if match_ready and line == 'Your:':
-                        your_n = n
+                        cm_open = True
+                        cm_count = 0
 
-                     if match_ready and n == ( your_n + 2 ):
-                        your_cm = line.replace( ' cM', '' ).replace( ',', '' )
-                        #print( '! your cm', n, your_cm )
+                     m = cm_pattern.match( line)
+                     if m and cm_open:
+                        cm_count += 1
+                        cm = line.replace( ' cM', '' ).replace( ',', '' )
 
-                     if match_ready and n == ( your_n + 6 ):
-                        match_cm = line.replace( ' cM', '' ).replace( ',', '' )
-                        #print( '! match cm', n, match_cm )
-
-                        m = full_pattern.match( match_line )
-                        if m:
-                           #print( '! output' )
-                           other_name = m.group(1)
-                           match_id = m.group(2)
-                           other_id = m.group(3)
-
-                           output( 'you', your_cm, other_name, other_id, name_of_match, match_id, match_cm, outf )
+                        if cm_count == 1:
+                           your_cm = cm
 
                         else:
-                           print( 'didnt match:', file=sys.stderr )
-                           print( match_line, file=sys.stderr )
+                           # second cM line
+                           match_cm = cm
 
-                        match_open = False
-                        match_ready = False
-                        match_line = ''
-                        your_line = 0
+                           m = full_pattern.match( match_line )
+                           if m:
+                              #print( '! output' )
+                              other_name = m.group(1)
+                              match_id = m.group(2)
+                              other_id = m.group(3)
+
+                              output( 'you', your_cm, other_name, other_id, name_of_match, match_id, match_cm, outf )
+
+                           else:
+                              # it is possible something was wrong
+                              print( 'didnt match:', file=sys.stderr )
+                              print( match_line, file=sys.stderr )
+
+                           # start looking for another match
+                           match_open = False
+                           match_ready = False
+                           cm_open = False
