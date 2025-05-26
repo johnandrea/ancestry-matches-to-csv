@@ -8,7 +8,7 @@ The first script works on files saved from the account owner's page of matches.
 The second works on files from the account owner's pages of shared matches.
 
 - Requires Python 3.6+
-- Assumes input names are UTF-8
+- Assumes input names are UTF-8, page text is English.
 
 ## Usage ##
 
