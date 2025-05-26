@@ -126,15 +126,13 @@ def output_header( f ):
        out += ',"Other id"'
 
     out += ',"Match","cM with Other"'
-    if options['add-id'] and not options['id-with-name']:
-       out += ',"Match id"'
     if options['add-relation']:
        out += ',"relation with Other"'
 
     print( out, file=f )
 
 
-def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_id, match_cm, match_relation, f ):
+def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, f ):
     # as csv
     if is_int( owner_cm ) and int(owner_cm) >= options['min-cm']:
        name1 = escape_quote( owner )
@@ -144,7 +142,6 @@ def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, m
        if options['add-id']:
           if options['id-with-name']:
              name2 += '/' + other_id
-             name3 += '/' + match_id
 
        out = quoted( name1 )
        out += ',' + quoted( owner_cm )
@@ -154,8 +151,6 @@ def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, m
        if options['separate-id']:
           out += ',' + quoted( other_id )
        out += ',' + quoted( name3 )
-       if options['separate-id']:
-          out += ',' + quoted( match_id )
        out += ',' + quoted( match_cm )
        if options['add-relation']:
           out += ',' + quoted( match_relation )
@@ -256,12 +251,11 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
                            m = full_pattern.match( match_line )
                            if m:
-                              #print( '! output' )
                               other_name = m.group(1)
-                              match_id = m.group(2)
+                              #owner_id = m.group(2)  # not useful
                               other_id = m.group(3)
 
-                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_id, match_cm, match_relation, outf )
+                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, outf )
 
                            else:
                               # it is possible something was wrong
