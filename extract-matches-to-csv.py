@@ -23,7 +23,7 @@ Needs: Python 3.6+
 This code is released under the MIT License:
 https://opensource.org/licenses/MIT
 Copyright (c) 2025 John A. Andrea
-v3.1.1
+v3.1.2
 
 No support provided.
 '''
@@ -122,6 +122,7 @@ compareurl_pattern = re.compile( r'^.*discoveryui-matches/compare/([A-Za-z0-9-]*
 cm_pattern = re.compile( r'^(.*) cM | ' )
 
 with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
+     print( options['out-file'] )
 
      if options['add-header']:
         header = '"name 1","name 2","cM"'
