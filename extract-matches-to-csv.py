@@ -23,7 +23,7 @@ Needs: Python 3.6+
 This code is released under the MIT License:
 https://opensource.org/licenses/MIT
 Copyright (c) 2025 John A. Andrea
-v3.1.3
+v3.2
 
 No support provided.
 '''
@@ -39,6 +39,7 @@ def get_program_options():
     # with names flipped into 'positive' verbs
     results['add-id'] = True
     results['add-header'] = True
+    results['add-relation'] = True
 
     arg_help = 'Convert Ancestry matches output to CSV list.'
     parser = argparse.ArgumentParser( description=arg_help )
@@ -46,6 +47,10 @@ def get_program_options():
     arg_help = 'Do not include a header in the output file.'
     arg_default = not results['add-header']
     parser.add_argument( '--skip-header', default=arg_default, action='store_true', help=arg_help )
+
+    arg_help = 'Do not include relationship estimates in the output file.'
+    arg_default = not results['add-relation']
+    parser.add_argument( '--skip-relationship', default=arg_default, action='store_true', help=arg_help )
 
     arg_help = 'Do not include account unique ids in the output file.'
     arg_default = not results['add-id']
@@ -72,6 +77,7 @@ def get_program_options():
 
     results['add-id'] = not args.skip_id
     results['add-header'] = not args.skip_header
+    results['add-relation'] = not args.skip_relationship
 
     return results
 
@@ -86,25 +92,39 @@ def quoted( s ):
     return '"' + s.strip() + '"'
 
 
-def output( owner, match, owner_id, match_id, cm, f ):
+def output_header( f ):
+    out = '"owner","match"'
+    if options['add-id'] and not options['id-with-name']:
+       out += ',"match id"'
+    out += ',"cM"'
+    if options['add-relation']:
+       out += ',"relationship"'
+    print( out, file=f )
+
+
+def output( owner, match, match_id, cm, relation, f ):
     # as csv
     if is_int( cm ) and int(cm) >= options['min-cm']:
        name1 = escape_quote( owner )
        name2 = escape_quote( match )
 
-       rest = ''
+       show_id = True
        if options['add-id']:
           if options['id-with-name']:
-             name1 += '/' + owner_id
              name2 += '/' + match_id
-          else:
-             rest = ',' + quoted( owner_id )
-             rest += ',' + quoted( match_id )
+             show_id = False
 
        out = quoted( name1 )
        out += ',' + quoted( name2 )
+
+       if show_id:
+          out += ',' + quoted( match_id )
+
        out += ',' + quoted( cm )
-       out += rest
+
+       if options['add-relation']:
+          out += ',' + quoted( relation )
+
        print( out, file=f )
 
 
@@ -125,10 +145,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
      print( 'output in', options['out-file'] )
 
      if options['add-header']:
-        header = '"name 1","name 2","cM"'
-        if options['add-id'] and not options['id-with-name']:
-           header += ',"id 1","id 2"'
-        print( header, file=outf )
+        output_header( outf )
 
      # as of 2025 the owner's name does not appear on the saved match page
      owner_name = 'you'
@@ -148,13 +165,14 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                      if m:
                         # name was previous line
                         match_name = prev_line
-                        owner_id = m.group(1)
+                        #owner_id = m.group(1)  # not useful
                         match_id = m.group(2)
                      else:
                         m = cm_pattern.match( line )
                         if m:
-                           # also remove the hundreds separator (,)
+                           # also remove the hundreds separator
                            cm = m.group(1).replace( ',', '' )
+                           relation = prev_line
 
-                           output( owner_name, match_name, owner_id, match_id, cm, outf )
+                           output( owner_name, match_name, match_id, cm, relation, outf )
                      prev_line = line
