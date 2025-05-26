@@ -49,7 +49,7 @@ that a file is created without resorting to command line usage. For the shared m
 
 --min-cm CMVALUE
 
-Reject any matches with a cM match smaller than this value. Default is 22.
+Reject any matches with a cM value smaller than this value. Default is 22.
 
 --skip-header
 
