@@ -20,7 +20,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # Your:
 # relation of you with OTHERMATCH
 # X cM
-# paternan/maternal side
+# paternal/maternal side
 # MATCHNAME's
 # relation of MATCHNAME with OTHERMATCH
 # Y cM
@@ -36,7 +36,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9
+# v0.9.2
 #
 # No support provided.
 
@@ -54,7 +54,10 @@ end_pattern = re.compile( r'^.*matchesofmatches> *$' )
 
 full_pattern = re.compile( r'^(.*) <https://www.ancestry.*/discoveryui-matches/compare/([A-Za-z0-9-]*)/with/([A-Za-z0-9-]*)/matchesofmatches>' )
 
+partial_url = re.compile( r' <http.*' )
+
 with open( 'shared-matches.csv', 'w', encoding='utf-8' ) as outf:
+     print( 'output in', 'shared-matches.csv' )
 
      header = '"you","cM with Other","Other","Other id","Match,"cM with Other","Match id"'
      print( header, file=outf )
@@ -86,6 +89,9 @@ with open( 'shared-matches.csv', 'w', encoding='utf-8' ) as outf:
                         # this occors only once per input file
                         found_you_and = True
                         name_of_match = line.replace( 'You and ', '' )
+                        # the name might look like: You and First Second <https://www.ancestry...
+                        # so also get rid of that url
+                        name_of_match = re.sub( partial_url, '', name_of_match )
                         #print( '! you and', n, name_of_match )
 
                      m = start_pattern.match( line )
