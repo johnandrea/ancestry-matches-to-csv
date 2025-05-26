@@ -31,7 +31,7 @@ dir matches.csv
 
 Example of using the command line to change options:
 ```
-extract-matches-to-csv.py --id-with-name --min-cm 32
+extract-matches-to-csv.py --id-with-name --min-cm 18
 ```
 
 ## Options ## 
