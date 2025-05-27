@@ -41,7 +41,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 
 def get_version():
-    return '4.0.1'
+    return '4.0.2'
 
 
 def get_program_options():
@@ -141,29 +141,30 @@ def output_header( f ):
     print( out, file=f )
 
 
-def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, managed_by, f ):
+#def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, managed_by, f ):
+def output( data, f ):
     # as csv
-    if is_int( owner_cm ) and int(owner_cm) >= options['min-cm']:
-       name1 = escape_quote( owner )
-       name2 = escape_quote( other_name )
-       name3 = escape_quote( match_name )
+    if is_int( data['your_cm'] ) and int(data['your_cm']) >= options['min-cm']:
+       name1 = escape_quote( data['owner'] )
+       name2 = escape_quote( data['other_name'] )
+       name3 = escape_quote( data['name_of_match'] )
 
        if options['add-id']:
           if options['id-with-name']:
-             name2 += '/' + other_id
+             name2 += '/' + data['other_id']
 
        out = quoted( name1 )
-       out += ',' + quoted( owner_cm )
+       out += ',' + quoted( data['your_cm'] )
        if options['add-relation']:
-          out += ',' + quoted( owner_relation )
+          out += ',' + quoted( data['your_relation'] )
        out += ',' + quoted( name2 )
        if options['separate-id']:
-          out += ',' + quoted( other_id )
+          out += ',' + quoted( data['other_id'] )
        out += ',' + quoted( name3 )
-       out += ',' + quoted( match_cm )
+       out += ',' + quoted( data['match_cm'] )
        if options['add-relation']:
-          out += ',' + quoted( match_relation )
-       out += ',' + quoted( managed_by )
+          out += ',' + quoted( data['match_relation'] )
+       out += ',' + quoted( data['managed_by'] )
 
        print( out, file=f )
 
@@ -188,10 +189,13 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
      if options['add-header']:
         output_header( outf )
 
+     data = dict()
+     data['owner'] = 'you'
+
      for filename in glob.glob( '*.txt' ):
          with open( filename, 'r', encoding='utf-8' ) as inf:
               found_you_and = False
-              name_of_match = ''
+              data['name_of_match'] = ''
 
               # found the line that starts with other name and ids
               match_open = False
@@ -208,12 +212,13 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
               # number of cM lines after "Your:"
               cm_count = 0
 
-              other_name = ''
-              your_cm = ''
-              your_relation = ''
-              match_cm = ''
+              data['other_name'] = ''
+              data['your_cm'] = ''
+              data['your_relation'] = ''
+              data['match_cm'] = ''
+              data['managed_by'] = ''
+
               prev_line = ''
-              managed_by = ''
 
               for line in inf:
                   line = line.strip()
@@ -225,7 +230,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                         name_of_match = line.replace( 'You and ', '' )
                         # the name might look like: You and First Second <https://www.ancestry...
                         # so also get rid of that url
-                        name_of_match = re.sub( partial_url, '', name_of_match )
+                        data['name_of_match'] = re.sub( partial_url, '', name_of_match )
 
                      m = start_pattern.match( line )
                      if m and found_you_and:
@@ -241,7 +246,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                         match_ready = True
 
                      if match_ready and line.startswith( 'Managed by ' ):
-                        managed_by = line.replace( 'Managed by ', '' )
+                        data['managed_by'] = line.replace( 'Managed by ', '' )
 
                      if match_ready and line == 'Your:':
                         cm_open = True
@@ -253,21 +258,22 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                         cm = line.replace( ' cM', '' ).replace( ',', '' )
 
                         if cm_count == 1:
-                           your_cm = cm
-                           your_relation = prev_line
+                           data['your_cm'] = cm
+                           data['your_relation'] = prev_line
 
                         else:
                            # second cM line
-                           match_cm = cm
-                           match_relation = prev_line
+                           data['match_cm'] = cm
+                           data['match_relation'] = prev_line
 
                            m = full_pattern.match( match_line )
                            if m:
-                              other_name = m.group(1)
+                              data['other_name'] = m.group(1)
                               #owner_id = m.group(2)  # not useful
-                              other_id = m.group(3)
+                              data['other_id'] = m.group(3)
 
-                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, managed_by, outf )
+                              #output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, managed_by, outf )
+                              output( data, outf )
 
                            else:
                               # it is possible something was wrong
@@ -278,6 +284,6 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                            match_open = False
                            match_ready = False
                            cm_open = False
-                           managed_by = ''
+                           data['managed_by'] = ''
 
                      prev_line = line
