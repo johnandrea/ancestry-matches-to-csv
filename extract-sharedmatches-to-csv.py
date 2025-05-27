@@ -5,30 +5,25 @@ import argparse
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Read through an Ancestry match page(s) saved as a text file.
-# Example:
+# Example input:
 # ----------------------------
+# You and *MATCH NAME* <https://www.ancestry
+#
+# *SHARED NAME* <https://www.ancestry.../discoveryui-matches/compare/
+# *YOUR ID*
+# /with/
+# *SHARED ID*
+# /matchesofmatches>
 # ...
-# You and MATCHNAME
+# Managed by *MANAGED NAME*
 # ...
 # Your:
+# *YOUR RELATIONSHIP WITH SHARED*
+# *YOUR CM WITH SHARED* cM
 # ...
-# MATCHNAME's
-# ...
-# OTHERMATCH <https://www.ancestry.COUNTRY/discoveryui-matches/compare/
-# ID1/with/ID2...
-# ...ID2/matchesofmatches>
-# ...
-# Your:
-# relation of you with OTHERMATCH
-# X cM
-# ...
-# MATCHNAME's
-# relation of MATCHNAME with OTHERMATCH
-# Y cM
-# ...
-# # OTHERMATCH2 <https://www.ancestry.COUNTRY/discoveryui-matches/compare/
-# ID1/with/ID2...
-# ...ID2/matchesofmatches>
+# MATCH NAME's:
+# *MATCH RELATIONSHIP WITH SHARED*
+# *MATCH CM WITH SHARED* cM
 # ...
 # -----------------------------
 # Program assumptions: English pages, names contain only ascii, cM values are integers
@@ -41,7 +36,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 
 def get_version():
-    return '4.0.2'
+    return '4.0.4'
 
 
 def get_program_options():
@@ -120,51 +115,59 @@ def quoted( s ):
 
 
 def output_header( f ):
-    # -- updaated
-    # "you","cM with Other","relation with Other"
-    # ,"Other","Other id"
-    # ,"Match","cM with Other","relation with Other"
-
-    out = '"you","Your cM with Match"'
+    # you vs shared
+    out = '"Your cM with Shared person"'
     if options['add-relation']:
-       out += ',"Your relation with Match"'
+       out += ',"Your relation to Shared person"'
 
+    # shared
     out += ',"Shared person"'
     if options['add-id'] and not options['id-with-name']:
        out += ',"Shared person id"'
 
-    out += ',"Match","Match\\\'s cM with shared person"'
+    # match vs shared
+    out += ',"Match","Match cM with Shared person"'
     if options['add-relation']:
-       out += ',"Match\\\'s relationship to shared person"'
+       out += ',"Match relation to Shared person"'
+
     out += ',"Managed by"'
 
     print( out, file=f )
 
 
-#def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, managed_by, f ):
 def output( data, f ):
     # as csv
     if is_int( data['your_cm'] ) and int(data['your_cm']) >= options['min-cm']:
-       name1 = escape_quote( data['owner'] )
-       name2 = escape_quote( data['other_name'] )
-       name3 = escape_quote( data['name_of_match'] )
+       shared = escape_quote( data['shared_name'] )
+       match = escape_quote( data['match_name'] )
+
+       out = ''
 
        if options['add-id']:
           if options['id-with-name']:
-             name2 += '/' + data['other_id']
+             shared += '/' + data['shared_id']
 
-       out = quoted( name1 )
+       # you vs shared
        out += ',' + quoted( data['your_cm'] )
        if options['add-relation']:
           out += ',' + quoted( data['your_relation'] )
-       out += ',' + quoted( name2 )
+
+       # shared
+       out += ',' + quoted( shared )
        if options['separate-id']:
-          out += ',' + quoted( data['other_id'] )
-       out += ',' + quoted( name3 )
+          out += ',' + quoted( data['shared_id'] )
+
+       # match vs shared
+       out += ',' + quoted( match )
        out += ',' + quoted( data['match_cm'] )
        if options['add-relation']:
           out += ',' + quoted( data['match_relation'] )
+
        out += ',' + quoted( data['managed_by'] )
+
+       # remove leading comma
+       if out.startswith( ',' ):
+          out = out.replace( ',', '', 1 )
 
        print( out, file=f )
 
@@ -190,12 +193,11 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
         output_header( outf )
 
      data = dict()
-     data['owner'] = 'you'
 
      for filename in glob.glob( '*.txt' ):
          with open( filename, 'r', encoding='utf-8' ) as inf:
               found_you_and = False
-              data['name_of_match'] = ''
+              data['match_name'] = ''
 
               # found the line that starts with other name and ids
               match_open = False
@@ -212,10 +214,12 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
               # number of cM lines after "Your:"
               cm_count = 0
 
-              data['other_name'] = ''
-              data['your_cm'] = ''
-              data['your_relation'] = ''
-              data['match_cm'] = ''
+              data['shared_name'] = ''
+              data['shared_id'] = ''
+              data['your_cm'] = ''        # with shared
+              data['your_relation'] = ''  # with shared
+              data['match_cm'] = ''       # with shared
+              data['match_relation'] = '' # with shared
               data['managed_by'] = ''
 
               prev_line = ''
@@ -227,10 +231,10 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                      if line.startswith( 'You and ' ) and not found_you_and:
                         # this occors only once per input file
                         found_you_and = True
-                        name_of_match = line.replace( 'You and ', '' )
+                        match_name = line.replace( 'You and ', '' )
                         # the name might look like: You and First Second <https://www.ancestry...
                         # so also get rid of that url
-                        data['name_of_match'] = re.sub( partial_url, '', name_of_match )
+                        data['match_name'] = re.sub( partial_url, '', match_name )
 
                      m = start_pattern.match( line )
                      if m and found_you_and:
@@ -268,9 +272,9 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
 
                            m = full_pattern.match( match_line )
                            if m:
-                              data['other_name'] = m.group(1)
+                              data['shared_name'] = m.group(1)
                               #owner_id = m.group(2)  # not useful
-                              data['other_id'] = m.group(3)
+                              data['shared_id'] = m.group(3)
 
                               #output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, managed_by, outf )
                               output( data, outf )
