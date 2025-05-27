@@ -16,17 +16,22 @@ Options:
 --id-with-name default false
 --skip-header default false
 --min-cm default 22
+--skip-relationship
 
-Assumptions: English pages, names contain only ascii
+Assumptions: English pages, names contain only ascii, cM values are integers
 Needs: Python 3.6+
 
 This code is released under the MIT License:
 https://opensource.org/licenses/MIT
 Copyright (c) 2025 John A. Andrea
-v3.2
 
 No support provided.
 '''
+
+
+def get_version():
+    return '4.1'
+
 
 def get_program_options():
     results = dict()
@@ -40,6 +45,9 @@ def get_program_options():
     results['add-id'] = True
     results['add-header'] = True
     results['add-relation'] = True
+
+    arg_help = 'Show version then exit.'
+    parser.add_argument( '--version', action='version', version=get_version() )
 
     arg_help = 'Convert Ancestry matches output to CSV list.'
     parser = argparse.ArgumentParser( description=arg_help )

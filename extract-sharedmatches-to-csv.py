@@ -36,7 +36,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 
 def get_version():
-    return '4.0.4'
+    return '4.1'
 
 
 def get_program_options():
