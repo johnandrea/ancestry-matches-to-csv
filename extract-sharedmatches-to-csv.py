@@ -37,8 +37,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 # This code is released under the MIT License:
 # https://opensource.org/licenses/MIT
 # Copyright (c) 2025 John A. Andrea
-# v0.9.8
 # No support provided.
+
+
+def get_version():
+    return '4.0.1'
 
 
 def get_program_options():
@@ -56,6 +59,9 @@ def get_program_options():
 
     arg_help = 'Convert Ancestry matches output to CSV list.'
     parser = argparse.ArgumentParser( description=arg_help )
+
+    arg_help = 'Show version then exit.'
+    parser.add_argument( '--version', action='version', version=get_version() )
 
     arg_help = 'Do not include a header in the output file.'
     arg_default = not results['add-header']
@@ -114,26 +120,28 @@ def quoted( s ):
 
 
 def output_header( f ):
+    # -- updaated
     # "you","cM with Other","relation with Other"
     # ,"Other","Other id"
     # ,"Match","cM with Other","relation with Other"
 
-    out = '"you","cM with Other"'
+    out = '"you","Your cM with Match"'
     if options['add-relation']:
-       out += ',"relation with Other"'
+       out += ',"Your relation with Match"'
 
-    out += ',"Other"'
+    out += ',"Shared person"'
     if options['add-id'] and not options['id-with-name']:
-       out += ',"Other id"'
+       out += ',"Shared person id"'
 
-    out += ',"Match","cM with Other"'
+    out += ',"Match","Match\\\'s cM with shared person"'
     if options['add-relation']:
-       out += ',"relation with Other"'
+       out += ',"Match\\\'s relationship to shared person"'
+    out += ',"Managed by"'
 
     print( out, file=f )
 
 
-def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, f ):
+def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, match_cm, match_relation, managed_by, f ):
     # as csv
     if is_int( owner_cm ) and int(owner_cm) >= options['min-cm']:
        name1 = escape_quote( owner )
@@ -155,6 +163,7 @@ def output( owner, owner_cm, owner_relation, other_name, other_id, match_name, m
        out += ',' + quoted( match_cm )
        if options['add-relation']:
           out += ',' + quoted( match_relation )
+       out += ',' + quoted( managed_by )
 
        print( out, file=f )
 
@@ -204,6 +213,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
               your_relation = ''
               match_cm = ''
               prev_line = ''
+              managed_by = ''
 
               for line in inf:
                   line = line.strip()
@@ -230,6 +240,9 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                         match_open = False
                         match_ready = True
 
+                     if match_ready and line.startswith( 'Managed by ' ):
+                        managed_by = line.replace( 'Managed by ', '' )
+
                      if match_ready and line == 'Your:':
                         cm_open = True
                         cm_count = 0
@@ -254,7 +267,7 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                               #owner_id = m.group(2)  # not useful
                               other_id = m.group(3)
 
-                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, outf )
+                              output( 'you', your_cm, your_relation, other_name, other_id, name_of_match, match_cm, match_relation, managed_by, outf )
 
                            else:
                               # it is possible something was wrong
@@ -265,5 +278,6 @@ with open( options['out-file'], 'w', encoding='utf-8' ) as outf:
                            match_open = False
                            match_ready = False
                            cm_open = False
+                           managed_by = ''
 
                      prev_line = line
